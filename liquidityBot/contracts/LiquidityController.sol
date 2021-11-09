@@ -1,18 +1,28 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.7.0;
+pragma abicoder v2;
 
 import "hardhat/console.sol";
+
 import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import '@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol';
-import 'contracts/Ownable.sol';
+import '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';
 
-contract LiquidityController is Ownable, ISwapRouter {
+import 'contracts/Ownable.sol';
+import 'contracts/MyERC721Receiver.sol'
+
+contract LiquidityController is Ownable, MyERC721Receiver {
+    ISwapRouter public immutable swapRouter;
+    INonfungiblePositionManager public immutable nonfungiblePositionManager;
 
     /**
-     Set the owner, same position info and create an initial position
+        Take in uniswap v3 contract info
      */ 
-    constructor() {
+    constructor(ISwapRouter _swapRouter,
+                INonfungiblePositionManager _nftManager) {
         super;
+        swapRouter = _swapRouter;
+        nonfungiblePositionManager = _nftManager;
 
         // TODO: Make initial position
     }

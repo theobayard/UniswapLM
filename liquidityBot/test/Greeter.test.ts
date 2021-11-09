@@ -1,6 +1,11 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
+/**
+ * This is like a tester for the testing suite/base infrastructure. 
+ * It should always work and has no relevance to the actual bot, 
+ * but if these aren't working something is wrong with the testing suite or hardhat.
+ */
 describe("Greeter", function () {
     it("Should return the new greeting once it's changed", async function () {
         const Greeter = await ethers.getContractFactory("Greeter");
