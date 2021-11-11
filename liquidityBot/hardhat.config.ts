@@ -23,12 +23,30 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.7.6",
+  solidity: {
+    compilers:[{
+    version: '0.7.6',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1_000,
+      },
+      metadata: {
+        bytecodeHash: 'none',
+      },
+    },
+  }]
+  },
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    forking: {
+      url: "https://eth-mainnet.alchemyapi.io/v2/ryMGa2C_deDiz_fQ4EQtWExb3ANceZxr",
+      // @ts-ignore: per the docs this is real
+      blockNumber: 13583529
     },
   },
   gasReporter: {

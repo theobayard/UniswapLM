@@ -13,17 +13,26 @@ import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 contract MyPositionHolder is IERC721Receiver {
     //// For enabling reception of NFTs
     struct Position {
+        uint256 tokenId;
         uint128 liquidity;
         address token0;
         address token1;
     }
 
+    INonfungiblePositionManager internal immutable nonfungiblePositionManager;
     Position internal currentPosition;
     bool internal isEmpty = true;
 
+    constructor(
+        INonfungiblePositionManager _nonfungiblePositionManager
+    ) {
+        nonfungiblePositionManager = _nonfungiblePositionManager;
+    }
+
+
     // Implementing `onERC721Received` so this contract can receive custody of erc721 tokens
     function onERC721Received(
-        address operator,
+        address,
         address,
         uint256 tokenId,
         bytes calldata
@@ -36,19 +45,36 @@ contract MyPositionHolder is IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
-    function _setPosition(uint256 tokenId) internal {
-
-        (, , address token0, address token1, , , , uint128 liquidity, , , , ) =
-            nonfungiblePositionManager.positions(tokenId);
-
+    function _setPosition(uint256 _tokenId) internal {
         isEmpty = false;
 
-        // set the data for position
-        // operator is msg.sender
-        currentPosition = Position({
-            liquidity: liquidity, 
-            token0: token0, 
-            token1: token1
-        });
+        // Avoid stack depth problems by creating new enviroment
+        currentPosition.tokenId = _tokenId;
+        {
+            (, , currentPosition.token0, currentPosition.token1, , , , currentPosition.liquidity, , , , ) =
+                nonfungiblePositionManager.positions(currentPosition.tokenId);
+        }
+
+    }
+
+    /**
+     * Adds fees from position to contract
+     */
+    function _meltPosition() internal returns (uint256 amount0, uint256 amount1) {
+        // Caller must own the ERC721 position, meaning it must be a deposit
+
+        // set amount0Max and amount1Max to uint256.max to collect all fees
+        // alternatively can set recipient to msg.sender and avoid another transaction in `sendToOwner`
+        INonfungiblePositionManager.CollectParams memory params =
+            INonfungiblePositionManager.CollectParams({
+                tokenId: currentPosition.tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            });
+
+        (amount0, amount1) = nonfungiblePositionManager.collect(params);
+
+        isEmpty = true;
     }
 }

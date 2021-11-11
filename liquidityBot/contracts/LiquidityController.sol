@@ -9,20 +9,19 @@ import '@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol';
 import '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';
 
 import 'contracts/Ownable.sol';
-import 'contracts/MyERC721Receiver.sol'
+import 'contracts/MyPositionHolder.sol';
 
-contract LiquidityController is Ownable, MyERC721Receiver {
+contract LiquidityController is Ownable, MyPositionHolder {
     ISwapRouter public immutable swapRouter;
-    INonfungiblePositionManager public immutable nonfungiblePositionManager;
 
     /**
         Take in uniswap v3 contract info
      */ 
     constructor(ISwapRouter _swapRouter,
-                INonfungiblePositionManager _nftManager) {
-        super;
+                INonfungiblePositionManager _nftManager)
+                MyPositionHolder(_nftManager)
+                Ownable() {
         swapRouter = _swapRouter;
-        nonfungiblePositionManager = _nftManager;
 
         // TODO: Make initial position
     }
