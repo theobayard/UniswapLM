@@ -1,83 +1,58 @@
-import { expect } from "chai";
-import { ethers, waffle } from "hardhat";
-import addresses from "../addresses.config"
-import { MyPositionHolder__factory } from "../typechain/factories/MyPositionHolder__factory";
-import { INonfungiblePositionManager, ISwapRouter, IUniswapV3Factory, IWETH9, MyPositionHolder } from "../typechain";
-import { Wallet } from "ethers";
-import uniswapFixture from "./common/uniswapFixture";
-import { TestERC20 } from "../typechain/TestERC20";
-import { getMinTick, getMaxTick } from "@uniswap/v3-periphery-tests/test/shared/ticks"
-import { FeeAmount, TICK_SPACINGS } from '@uniswap/v3-periphery-tests/test/shared/constants'
+// import { expect } from "chai";
+// import { ethers, waffle } from "hardhat";
+// import addresses from "../addresses.config"
+// import { MyPositionHolder__factory } from "../typechain/factories/MyPositionHolder__factory";
+// import { INonfungiblePositionManager, MyPositionHolder } from "../typechain";
+// import { Wallet } from "ethers";
+// import positionFixture from "./common/positionFixture"
+// import { Pool, Position, NonfungiblePositionManager } from "@uniswap/v3-sdk";
+// import { Token, Percent } from "@uniswap/sdk-core";
+// import { getCurrentBlock, mintPosition } from "./common/util";
 
-describe("MyPositionHolder", async function () {
-  let positionHolder:MyPositionHolder;
-  let MyPositionHolder:MyPositionHolder__factory;
-  let wallets: Wallet[];
-  let wallet:Wallet, other:Wallet;
-  let loadFixture: ReturnType<typeof waffle.createFixtureLoader>
+// describe("MyPositionHolder", async function () {
+//   let positionHolder:MyPositionHolder;
+//   let MyPositionHolder:MyPositionHolder__factory;
+//   let wallets: Wallet[];
+//   let wallet:Wallet, other:Wallet;
+//   let loadFixture: ReturnType<typeof waffle.createFixtureLoader>
 
-  before("create factory", async ()=>{
-    MyPositionHolder = 
-      await ethers.getContractFactory("MyPositionHolder") as MyPositionHolder__factory;
-    wallets = await (ethers as any).getSigners();
-    [wallet, other] = wallets;
-    loadFixture = waffle.createFixtureLoader(wallets);
-  })
+//   before("create factory", async ()=>{
+//     MyPositionHolder = 
+//       await ethers.getContractFactory("MyPositionHolder") as MyPositionHolder__factory;
+//     wallets = await (ethers as any).getSigners();
+//     [wallet, other] = wallets;
+//     loadFixture = waffle.createFixtureLoader(wallets);
+//     ({pool,token0,token1,position, positionManager} = await loadFixture(positionFixture))
+//   })
 
-  let factory: IUniswapV3Factory
-  let nft: INonfungiblePositionManager
-  let tokens: [TestERC20, TestERC20, TestERC20]
-  let weth9: IWETH9
-  let router: ISwapRouter
+//   let pool:Pool;
+//   let token0:Token, token1:Token;
+//   let position:Position;
+//   let positionManager:INonfungiblePositionManager;
+  
 
-  beforeEach(async ()=>{
-    positionHolder = await MyPositionHolder.deploy(addresses.uniswap.nonfungiblePositionManager);
-    await positionHolder.deployed();
-    ({ nft, factory, tokens, weth9, router } = await loadFixture(uniswapFixture))
-  })
+//   beforeEach(async ()=>{
+//     positionHolder = await MyPositionHolder.deploy(addresses.uniswap.nonfungiblePositionManager);
+//     await positionHolder.deployed();
+//   })
 
-  it("Should be able to receive a position", async function () {
-    await nft.mint({
-      token0: tokens[0].address,
-      token1: tokens[1].address,
-      tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      fee: FeeAmount.MEDIUM,
-      recipient: positionHolder.address,
-      amount0Desired: 15,
-      amount1Desired: 15,
-      amount0Min: 0,
-      amount1Min: 0,
-      deadline: 10,
-    })
-  })
+//   it("Should be able to receive a position", async function () {
 
-  it("Should fail when given a second position", async function () {
-    await nft.mint({
-      token0: tokens[0].address,
-      token1: tokens[1].address,
-      tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      fee: FeeAmount.MEDIUM,
-      recipient: positionHolder.address,
-      amount0Desired: 15,
-      amount1Desired: 15,
-      amount0Min: 0,
-      amount1Min: 0,
-      deadline: 10,
-    })
-    expect(await nft.mint({
-      token0: tokens[0].address,
-      token1: tokens[1].address,
-      tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      fee: FeeAmount.MEDIUM,
-      recipient: positionHolder.address,
-      amount0Desired: 15,
-      amount1Desired: 15,
-      amount0Min: 0,
-      amount1Min: 0,
-      deadline: 10,
-    })).to.be.revertedWith("This contract already has an NFT")
-  })
-})
+    
+//     await mintPosition(
+//       pool,
+//       position,
+//       positionManager,
+//       positionHolder,
+//       wallet,
+//       new Percent(50,10_000),
+//       200
+//     )
+
+//     // Verify it got the transaction
+//   })
+
+//   it("Should fail when given a second position", async function () {
+    
+//   })
+// })

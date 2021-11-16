@@ -38,8 +38,8 @@ contract MyPositionHolder is IERC721Receiver {
         bytes calldata
     ) external override returns (bytes4) {
         require(isEmpty, "This contract already has an NFT");
-        // get position information
-
+        
+        // set position information
         _setPosition(tokenId);
 
         return this.onERC721Received.selector;
